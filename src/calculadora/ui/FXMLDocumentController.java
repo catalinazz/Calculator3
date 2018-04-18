@@ -10,20 +10,23 @@ import javafx.scene.control.Label;
 
 public class FXMLDocumentController implements Initializable {
 
-    //data2s almacena los valores ultimos calculados en strings, funciona como segundo operando, se sobreescribe al operar o marcar igual.
-    String data2s = "";
-    float data2f = 0f;
-    //data1s almacena los valores ultimos indresados en strings, funciona como primer operando, se sobrescribe al volver a ingresar un valor luego de operar.
-    String data1s = "";
-    float data1f = 0f;
-//operador2 almacena el ultimo valor ingresado.
     String numberInputS = "";
     float numberInputF = 0f;
-    //guarda el ultimo operator ingresado para ser ejecutado 
-    //por el proximo operator a ingresar o al marcar igual.
+
+    //dataSecondS almacena los últimos valores ingresados en strings
+    //funciona como segundo operando
+    //se sobrescribe luego de operar.
+    String dataSecondS = "";
+    float dataSecondF = 0f;
+
+    //cuando dataFirstF esta en MIN_VALUE, adquiere el próximo valor de dataSecondS
+    //el String deja de usarse luego del primer uso, mientras que el float se sobreescribe con los resultados parciales.
+    //funciona de primer operando
+    String dataFirstS = "";
+    float dataFirstF = Float.MIN_VALUE;
+
+    //operator almacena el ultimo operador ingresado.
     String operator = "";
-    //Resultado parcial, el utlimo que se setea en las operaciones al finalizarlas
-    float partialResult = 0f;
 
     @FXML
     private Button minus;
@@ -121,10 +124,11 @@ public class FXMLDocumentController implements Initializable {
 
     void confirm() {
 
-        data1s = numberInputS;
+        dataSecondS = numberInputS;
 
-        if (data2f == 0f) {
-            data2s = data1s;
+        if (dataFirstF == Float.MIN_VALUE) {
+            dataFirstS = dataSecondS;
+
         }
 
     }
@@ -135,12 +139,13 @@ public class FXMLDocumentController implements Initializable {
 
         if (!(operator.isEmpty())) {
 
-            float solution = operate(operator, data1f, data2f);
-            data2f = solution;
-            data1f = 0f;
+            float solution = operate(operator, dataSecondF, dataFirstF);
+            dataFirstF = solution;
+            dataSecondF = 0f;
         }
         operator = o;
         numberInputS = "";
+        }        
 
     }
 
@@ -150,18 +155,17 @@ public class FXMLDocumentController implements Initializable {
         Object source = event.getSource();
 
         //CONVERSION
-        if (!(data1s.isEmpty())) {
-            data1f = Float.valueOf(data1s);
-            data1s = "";
+        if (!(dataSecondS.isEmpty())) {
+            dataSecondF = Float.valueOf(dataSecondS);
+            dataSecondS = "";
         }
 
-        if (!(data2s.isEmpty())) {
-            data2f = Float.valueOf(data2s);
-            data2s = "";
+        if (!(dataFirstS.isEmpty())) {
+            dataFirstF = Float.valueOf(dataFirstS);
+            dataFirstS = "";
         }
-
         //SOURCE
-        try {
+        if (!(dataFirstF == Float.MIN_VALUE)) {
             if (source == plus) {
                 String o = "+";
                 operator(o);
@@ -175,19 +179,19 @@ public class FXMLDocumentController implements Initializable {
                 String o = "/";
                 operator(o);
             }
-        } catch (Exception e) {
-            display.setText("ERROR");
-            clear();
+
         }
     }
 
     void clear() {
 
-        data2f = 0f;
-        data1f = 0f;
+        dataFirstF = Float.MIN_VALUE;
+        dataSecondF = 0f;
 
-        data2s = "";
-        data1s = "";
+        dataFirstS = "";
+        dataSecondS = "";
+
+        operator = "";
         numberInputS = "";
         display.setText("");
 
@@ -196,25 +200,25 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     public void handleButtonEqual(ActionEvent event) {
 
-        if (!(data1s.isEmpty())) {
-            data1f = Float.valueOf(data1s);
-            data1s = "";
+        if (!(dataSecondS.isEmpty())) {
+            dataSecondF = Float.valueOf(dataSecondS);
+            dataSecondS = "";
 
-            if (!(data2s.isEmpty())) {
-                data2f = Float.valueOf(data2s);
-                data2s = "";
+            if (!(dataFirstS.isEmpty())) {
+                dataFirstF = Float.valueOf(dataFirstS);
+                dataFirstS = "";
             }
 
-            if (!(data1f == 0 && data2f == 0)) {
+            if (!(dataSecondF == 0 && dataFirstF == 0)) {
 
-                float solution = operate(operator, data1f, data2f);
-                data2f = solution;
-                display.setText(String.valueOf(data2f));
+                float solution = operate(operator, dataFirstF, dataSecondF);
+                dataFirstF = solution;
+                display.setText(String.valueOf(dataFirstF));
             } else {
                 display.setText("ERROR");
             }
 
-            data1f = 0f;
+            dataSecondF = 0f;
         }
 
     }
@@ -224,14 +228,13 @@ public class FXMLDocumentController implements Initializable {
     ) {
 
         clear();
-        operator = "";
 
     }
 
     public float operate(String o, float a, float b) {
 
-        a = data2f;
-        b = data1f;
+        a = dataFirstF;
+        b = dataSecondF;
         o = operator;
         float solution = 0f;
 
@@ -244,12 +247,16 @@ public class FXMLDocumentController implements Initializable {
                     solution = a - b;
                     break;
                 case "/":
+                    if(b!=0){
                     solution = a / b;
+                    }else{
+                        Exception e = new Exception();
+                        throw e;
+                    }
                     break;
                 case "*":
                     solution = a * b;
                     break;
-
             }
         } catch (Exception e) {
             display.setText("ERROR");
