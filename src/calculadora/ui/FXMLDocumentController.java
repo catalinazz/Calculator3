@@ -140,8 +140,7 @@ public class FXMLDocumentController implements Initializable {
 
         convert();
 
-        if (!(dataFirstF == Float.MIN_VALUE)) {
-            if (!(dataSecondF == Float.MIN_VALUE || Float.MIN_VALUE == 0)) {
+            if (!(dataSecondF == Float.MIN_VALUE || dataFirstF == Float.MIN_VALUE )) {
                 try {
                     float solution = operate(operator, dataFirstF, dataSecondF);
                     dataFirstF = solution;
@@ -153,7 +152,7 @@ public class FXMLDocumentController implements Initializable {
                 errorMessage();
             }
 
-        }
+        
 
     }
 
@@ -221,9 +220,6 @@ public class FXMLDocumentController implements Initializable {
             dataFirstS = dataSecondS;
 
         }
-        
-        dataFirstF = dataFirstF;
-        dataSecondF = dataSecondF;
     }
 
     void convert() {
