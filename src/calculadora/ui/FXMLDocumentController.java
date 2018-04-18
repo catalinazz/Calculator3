@@ -122,6 +122,11 @@ public class FXMLDocumentController implements Initializable {
 
     }
 
+    void errorMessage() {
+        clear();
+        display.setText("ERROR");
+    }
+
     void confirm() {
 
         dataSecondS = numberInputS;
@@ -138,15 +143,31 @@ public class FXMLDocumentController implements Initializable {
         display.setText(display.getText() + o);
 
         if (!(operator.isEmpty())) {
-
-            float solution = operate(operator, dataSecondF, dataFirstF);
-            dataFirstF = solution;
-            dataSecondF = 0f;
+            try {
+                float solution = operate(operator, dataSecondF, dataFirstF);
+                dataFirstF = solution;
+                dataSecondF = 0f;
+            } catch (Exception e) {
+                errorMessage();
+            }
         }
         operator = o;
-        numberInputS = "";
-             
 
+    }
+
+    void convert() {
+
+        if (!(dataSecondS.isEmpty())) {
+            dataSecondF = Float.valueOf(dataSecondS);
+            dataSecondS = "";
+            numberInputS = "";
+        }
+
+        if (!(dataFirstS.isEmpty())) {
+            dataFirstF = Float.valueOf(dataFirstS);
+            dataFirstS = "";
+            numberInputS = "";
+        }
     }
 
     @FXML
@@ -154,16 +175,8 @@ public class FXMLDocumentController implements Initializable {
 
         Object source = event.getSource();
 
-        //CONVERSION
-        if (!(dataSecondS.isEmpty())) {
-            dataSecondF = Float.valueOf(dataSecondS);
-            dataSecondS = "";
-        }
-
-        if (!(dataFirstS.isEmpty())) {
-            dataFirstF = Float.valueOf(dataFirstS);
-            dataFirstS = "";
-        }
+        convert();
+        
         //SOURCE
         if (!(dataFirstF == Float.MIN_VALUE)) {
             if (source == plus) {
@@ -173,7 +186,7 @@ public class FXMLDocumentController implements Initializable {
                 String o = "-";
                 operator(o);
             } else if (source == mult) {
-                String o = "*";
+                String o = "x";
                 operator(o);
             } else if (source == div) {
                 String o = "/";
@@ -200,69 +213,61 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     public void handleButtonEqual(ActionEvent event) {
 
-        if (!(dataSecondS.isEmpty())) {
-            dataSecondF = Float.valueOf(dataSecondS);
-            dataSecondS = "";
-
-            if (!(dataFirstS.isEmpty())) {
-                dataFirstF = Float.valueOf(dataFirstS);
-                dataFirstS = "";
-            }
-
+        convert();
+        
+        if (!(dataFirstF == Float.MIN_VALUE)) {
             if (!(dataSecondF == 0 && dataFirstF == 0)) {
-
-                float solution = operate(operator, dataFirstF, dataSecondF);
-                dataFirstF = solution;
-                display.setText(String.valueOf(dataFirstF));
+                try {
+                    float solution = operate(operator, dataFirstF, dataSecondF);
+                    dataFirstF = solution;
+                    dataSecondF = 0f;
+                    display.setText(String.valueOf(dataFirstF));
+                } catch (Exception e) {
+                    errorMessage();
+                }
             } else {
-                display.setText("ERROR");
+                errorMessage();
             }
 
-            dataSecondF = 0f;
         }
 
     }
 
     @FXML
-    public void handleButtonClear(ActionEvent event
-    ) {
+    public void handleButtonClear(ActionEvent event) {
 
         clear();
 
     }
 
-    public float operate(String o, float a, float b) {
+    public float operate(String o, float a, float b) throws Exception {
 
         a = dataFirstF;
         b = dataSecondF;
         o = operator;
         float solution = 0f;
 
-        try {
-            switch (operator) {
-                case "+":
-                    solution = a + b;
-                    break;
-                case "-":
-                    solution = a - b;
-                    break;
-                case "/":
-                    if(b!=0){
+        switch (operator) {
+            case "+":
+                solution = a + b;
+                break;
+            case "-":
+                solution = a - b;
+                break;
+            case "/":
+                if (b != 0) {
                     solution = a / b;
-                    }else{
-                        Exception e = new Exception();
-                        throw e;
-                    }
-                    break;
-                case "*":
-                    solution = a * b;
-                    break;
-            }
-        } catch (Exception e) {
-            display.setText("ERROR");
-            clear();
+                } else {
+                    Exception e = new Exception();
+                    throw e;
+                }
+                break;
+            case "x":
+                solution = a * b;
+                break;
         }
-
+        
+        numberInputS = "";
         return solution;
     }
 
