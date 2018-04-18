@@ -1,6 +1,7 @@
 package calculadora.ui;
 
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -8,77 +9,63 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
+//TODO solo permite multiplicar o dividir una sola vez, porque la proxima vez,
+//muestra el resultado infinito o un valor inválido(podria ser MIN_VALUE).
+
 public class FXMLDocumentController implements Initializable {
+    
+
+    DecimalFormat format = new DecimalFormat("0.#");
 
     String numberInputS = "";
     float numberInputF = 0f;
 
-    //dataSecondS almacena los últimos valores ingresados en strings
-    //funciona como segundo operando
-    //se sobrescribe luego de operar.
+    // SEGUNDO OPERANDO
     String dataSecondS = "";
-    float dataSecondF = 0f;
+    float dataSecondF = Float.MIN_VALUE;
 
-    //cuando dataFirstF esta en MIN_VALUE, adquiere el próximo valor de dataSecondS
-    //el String deja de usarse luego del primer uso, mientras que el float se sobreescribe con los resultados parciales.
-    //funciona de primer operando
+    //PRIMER OPERANDO; GUARDA RESULTADOS
     String dataFirstS = "";
     float dataFirstF = Float.MIN_VALUE;
 
-    //operator almacena el ultimo operador ingresado.
+    //OPERADOR
     String operator = "";
 
+    //FXML 
     @FXML
     private Button minus;
-
     @FXML
     private Button nine;
-
     @FXML
     private Button six;
-
     @FXML
     private Button mult;
-
     @FXML
     private Label displayAnterior;
-
     @FXML
     private Button one;
-
     @FXML
     private Button clear;
-
     @FXML
     private Button seven;
-
     @FXML
     private Label display;
-
     @FXML
     private Button two;
-
     @FXML
     private Button three;
-
     @FXML
     private Button plus;
-
     @FXML
     private Button eight;
-
     @FXML
     private Button div;
-
     @FXML
     private Button equal;
-
     @FXML
     private Button zero;
-
     @FXML
     private Button four;
-
     @FXML
     protected Button five;
 
@@ -122,61 +109,13 @@ public class FXMLDocumentController implements Initializable {
 
     }
 
-    void errorMessage() {
-        clear();
-        display.setText("ERROR");
-    }
-
-    void confirm() {
-
-        dataSecondS = numberInputS;
-
-        if (dataFirstF == Float.MIN_VALUE) {
-            dataFirstS = dataSecondS;
-
-        }
-
-    }
-
-    void operator(String o) {
-
-        display.setText(display.getText() + o);
-
-        if (!(operator.isEmpty())) {
-            try {
-                float solution = operate(operator, dataSecondF, dataFirstF);
-                dataFirstF = solution;
-                dataSecondF = 0f;
-            } catch (Exception e) {
-                errorMessage();
-            }
-        }
-        operator = o;
-
-    }
-
-    void convert() {
-
-        if (!(dataSecondS.isEmpty())) {
-            dataSecondF = Float.valueOf(dataSecondS);
-            dataSecondS = "";
-            numberInputS = "";
-        }
-
-        if (!(dataFirstS.isEmpty())) {
-            dataFirstF = Float.valueOf(dataFirstS);
-            dataFirstS = "";
-            numberInputS = "";
-        }
-    }
-
     @FXML
     public void handleButtonOperator(ActionEvent event) {
 
         Object source = event.getSource();
 
         convert();
-        
+
         //SOURCE
         if (!(dataFirstF == Float.MIN_VALUE)) {
             if (source == plus) {
@@ -196,32 +135,17 @@ public class FXMLDocumentController implements Initializable {
         }
     }
 
-    void clear() {
-
-        dataFirstF = Float.MIN_VALUE;
-        dataSecondF = 0f;
-
-        dataFirstS = "";
-        dataSecondS = "";
-
-        operator = "";
-        numberInputS = "";
-        display.setText("");
-
-    }
-
     @FXML
     public void handleButtonEqual(ActionEvent event) {
 
         convert();
-        
+
         if (!(dataFirstF == Float.MIN_VALUE)) {
-            if (!(dataSecondF == 0 && dataFirstF == 0)) {
+            if (!(dataSecondF == Float.MIN_VALUE || Float.MIN_VALUE == 0)) {
                 try {
                     float solution = operate(operator, dataFirstF, dataSecondF);
                     dataFirstF = solution;
-                    dataSecondF = 0f;
-                    display.setText(String.valueOf(dataFirstF));
+                    display.setText(String.valueOf(format.format(dataFirstF)));
                 } catch (Exception e) {
                     errorMessage();
                 }
@@ -234,13 +158,13 @@ public class FXMLDocumentController implements Initializable {
     }
 
     @FXML
-    public void handleButtonClear(ActionEvent event) {
+    void handleButtonClear(ActionEvent event) {
 
         clear();
 
     }
 
-    public float operate(String o, float a, float b) throws Exception {
+    float operate(String o, float a, float b) throws Exception {
 
         a = dataFirstF;
         b = dataSecondF;
@@ -266,9 +190,74 @@ public class FXMLDocumentController implements Initializable {
                 solution = a * b;
                 break;
         }
-        
+
+        dataSecondF = Float.MIN_VALUE;
         numberInputS = "";
+
         return solution;
+    }
+
+    void operator(String o) {
+
+        display.setText(display.getText() + o);
+
+        if (!(operator.isEmpty())) {
+            try {
+                float solution = operate(operator, dataSecondF, dataFirstF);
+                dataFirstF = solution;
+            } catch (Exception e) {
+                errorMessage();
+            }
+        }
+        operator = o;
+
+    }
+
+    void confirm() {
+
+        dataSecondS = numberInputS;
+
+        if (dataFirstF == Float.MIN_VALUE) {
+            dataFirstS = dataSecondS;
+
+        }
+        
+        dataFirstF = dataFirstF;
+        dataSecondF = dataSecondF;
+    }
+
+    void convert() {
+
+        if (!(dataSecondS.isEmpty())) {
+            dataSecondF = Float.valueOf(dataSecondS);
+            dataSecondS = "";
+            numberInputS = "";
+        }
+
+        if (!(dataFirstS.isEmpty())) {
+            dataFirstF = Float.valueOf(dataFirstS);
+            dataFirstS = "";
+            numberInputS = "";
+        }
+    }
+
+    void errorMessage() {
+        clear();
+        display.setText("ERROR");
+    }
+
+    void clear() {
+
+        dataFirstF = Float.MIN_VALUE;
+        dataSecondF = Float.MIN_VALUE;
+
+        dataFirstS = "";
+        dataSecondS = "";
+
+        operator = "";
+        numberInputS = "";
+        display.setText("");
+
     }
 
     @Override
