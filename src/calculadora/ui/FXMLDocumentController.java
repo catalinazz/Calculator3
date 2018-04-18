@@ -16,7 +16,7 @@ public class FXMLDocumentController implements Initializable {
     //data1s almacena los valores ultimos indresados en strings, funciona como primer operando, se sobrescribe al volver a ingresar un valor luego de operar.
     String data1s = "";
     float data1f = 0f;
-//operador2 almacena el ultimo valor ingresado.
+    
     String numberInputS = "";
     float numberInputF = 0f;
     //guarda el ultimo operator ingresado para ser ejecutado 
