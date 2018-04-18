@@ -10,10 +10,13 @@ import javafx.scene.control.Label;
 
 public class FXMLDocumentController implements Initializable {
 
-    //dataS almacena los valores ultimos calculados en strings, se sobreescribe al operar o marcar igual.
-    String dataS = "";
-    float dataF = 0f;
-    //operador2 almacena el ultimo valor ingresado.
+    //data2s almacena los valores ultimos calculados en strings, funciona como segundo operando, se sobreescribe al operar o marcar igual.
+    String data2s = "";
+    float data2f = 0f;
+    //data1s almacena los valores ultimos indresados en strings, funciona como primer operando, se sobrescribe al volver a ingresar un valor luego de operar.
+    String data1s = "";
+    float data1f = 0f;
+//operador2 almacena el ultimo valor ingresado.
     String numberInputS = "";
     float numberInputF = 0f;
     //guarda el ultimo operator ingresado para ser ejecutado 
@@ -78,51 +81,51 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     public void handleButtonNumber(ActionEvent event) {
+        Object source = event.getSource();
 
-        try {
-            Object source = event.getSource();
+        if (source == one) {
+            numberInputS = (numberInputS + "1");
+            display.setText(numberInputS);
 
-            if (source == one) {
-                display.setText(display.getText() + "1");
-                numberInputS = (numberInputS + "1");
-            } else if (source == two) {
-                display.setText(display.getText() + "2");
-                numberInputS = numberInputS.concat("2");
-            } else if (source == three) {
-                display.setText(display.getText() + "3");
-                numberInputS = numberInputS.concat("3");
-            } else if (source == four) {
-                display.setText(display.getText() + "4");
-                numberInputS = numberInputS.concat("4");
-            } else if (source == five) {
-                display.setText(display.getText() + "5");
-                numberInputS = numberInputS.concat("5");
-            } else if (source == six) {
-                display.setText(display.getText() + "6");
-                numberInputS = numberInputS.concat("6");
-            } else if (source == seven) {
-                display.setText(display.getText() + "7");
-                numberInputS = numberInputS.concat("7");
-            } else if (source == eight) {
-                display.setText(display.getText() + "8");
-                numberInputS = numberInputS.concat("8");
-            } else if (source == nine) {
-                display.setText(display.getText() + "9");
-                numberInputS = numberInputS.concat("9");
-            } else if (source == zero) {
-                display.setText(display.getText() + "0");
-                numberInputS = numberInputS.concat("0");
-            }
+        } else if (source == two) {
+            numberInputS = (numberInputS + "2");
+            display.setText(numberInputS);
+        } else if (source == three) {
+            numberInputS = (numberInputS + "3");
+            display.setText(numberInputS);
+        } else if (source == four) {
+            numberInputS = (numberInputS + "4");
+            display.setText(numberInputS);
+        } else if (source == five) {
+            numberInputS = (numberInputS + "5");
+            display.setText(numberInputS);
+        } else if (source == six) {
+            numberInputS = (numberInputS + "6");
+            display.setText(numberInputS);
+        } else if (source == seven) {
+            numberInputS = (numberInputS + "7");
+            display.setText(numberInputS);
+        } else if (source == eight) {
+            numberInputS = (numberInputS + "8");
+            display.setText(numberInputS);
+        } else if (source == nine) {
+            numberInputS = (numberInputS + "9");
+            display.setText(numberInputS);
+        } else if (source == zero) {
+            numberInputS = (numberInputS + "0");
+            display.setText(numberInputS);
+        }
 
-            
-            if (!(numberInputS.equals(""))) {
-                dataS = numberInputS;
+        confirm();
 
-            }
+    }
 
-        } catch (Exception e) {
-            display.setText("ERROR");
+    void confirm() {
 
+        data1s = numberInputS;
+
+        if (data2s.isEmpty()) {
+            data2s = data1s;
         }
 
     }
@@ -133,106 +136,89 @@ public class FXMLDocumentController implements Initializable {
         //TODO hacer que al presionar el operador, este se muestre en pantalla, y usar la segunda pantalla de arriba
         Object source = event.getSource();
 
-        if (source == plus) {
+        if (!(data1s.isEmpty())) {
+            data1f = Float.valueOf(data1s);
+            data1s = "";
+        }
 
-            dataF = Float.valueOf(dataS);
-            numberInputF = Float.valueOf(numberInputS);
+        if (!(data2s.isEmpty())) {
+            data2f = Float.valueOf(data2s);
+            data2s = "";
+        }
+
+        if (source == plus) {
 
             display.setText(display.getText() + "+");
 
-            if (!(operator.equals(""))) {
+            if (!(operator.isEmpty())) {
 
-                if (!(numberInputF == 0f)) {
-
-                    float solution = operate(operator, numberInputF, dataF);
-                    String displaySolution = String.valueOf(solution);
-                    display.setText(displaySolution);
-                    partialResult = solution;
-                }
+                float solution = operate(operator, data1f, data2f);
+                data2f = solution;
+                display.setText(String.valueOf(data2f));
+                data1f = 0f;
 
             }
+
             operator = "+";
-            dataS = "";
             numberInputS = "";
         } else if (source == minus) {
 
-            dataF = Float.valueOf(dataS);
-            numberInputF = Float.valueOf(numberInputS);
+            display.setText(display.getText() + "-");
 
-            display.setText(display.getText() + "+");
+            if (!(operator.isEmpty())) {
 
-            if (!(operator.equals(""))) {
-
-                if (!(numberInputF == 0f)) {
-
-                    float solution = operate(operator, numberInputF, dataF);
-                    String displaySolution = String.valueOf(solution);
-                    display.setText(displaySolution);
-                                        partialResult = solution;
-                }
+                float solution = operate(operator, data1f, data2f);
+                data2f = solution;
+                display.setText(String.valueOf(data2f));
+                data1f = 0f;
 
             }
-            operator = "-";
 
-            dataS = "";
+            operator = "-";
             numberInputS = "";
         } else if (source == mult) {
 
-            dataF = Float.valueOf(dataS);
-            numberInputF = Float.valueOf(numberInputS);
+            display.setText(display.getText() + "*");
 
-            display.setText(display.getText() + "+");
+            if (!(operator.isEmpty())) {
 
-            if (!(operator.equals(""))) {
+                float solution = operate(operator, data1f, data2f);
+                data2f = solution;
+                display.setText(String.valueOf(data2f));
+                data1f = 0f;
 
-                if (!(numberInputF == 0f)) {
-
-                    float solution = operate(operator, numberInputF, dataF);
-                    String displaySolution = String.valueOf(solution);
-                    display.setText(displaySolution);
-                                        partialResult = solution;
-
-                }
             }
-            operator = "-";
 
-            dataS = "";
+            operator = "*";
             numberInputS = "";
         } else if (source == div) {
 
-            dataF = Float.valueOf(dataS);
-            numberInputF = Float.valueOf(numberInputS);
+            display.setText(display.getText() + "/");
 
-            display.setText(display.getText() + "+");
+            if (!(operator.isEmpty())) {
 
-            if (!(operator.equals(""))) {
-
-                if (!(numberInputF == 0f)) {
-
-                    float solution = operate(operator, numberInputF, dataF);
-                    String displaySolution = String.valueOf(solution);
-                    display.setText(displaySolution);
-                                        partialResult = solution;
-                }
+                float solution = operate(operator, data1f, data2f);
+                data2f = solution;
+                display.setText(String.valueOf(data2f));
+                data1f = 0f;
 
             }
-            operator = "-";
 
-            dataS = "";
+            operator = "/";
             numberInputS = "";
-
         }
 
     }
 
     void clear() {
 
-        dataF = 0f;
-        numberInputF = 0f;
+        data2f = 0f;
+        data1f = 0f;
 
-        dataS = "";
+        data2s = "";
+        data1s = "";
         numberInputS = "";
-
+        operator = "";
         display.setText("");
 
     }
@@ -240,23 +226,33 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     public void handleButtonEqual(ActionEvent event) {
 
-        dataF = Float.valueOf(dataS);
-        numberInputF = Float.valueOf(numberInputS);
+        if (!(data1s.isEmpty())) {
+            data1f = Float.valueOf(data1s);
+            data1s = "";
 
-        if (!(operator.equals(""))) {
-
-            if (!(numberInputF == 0f)) {
-
-                float solution = operate(operator, numberInputF, dataF);
-                String displaySolution = String.valueOf(solution);
-                display.setText(displaySolution);
+            if (!(data2s.isEmpty())) {
+                data2f = Float.valueOf(data2s);
+                data2s = "";
             }
+
+            if (!(data1f == 0 && data2f == 0)) {
+
+                float solution = operate(operator, data1f, data2f);
+                data2f = solution;
+                display.setText(String.valueOf(data2f));
+                display.setText(String.valueOf(data2f));
+            } else {
+                display.setText("ERROR");
+            }
+
+            data1f = 0f;
         }
 
     }
 
     @FXML
-    public void handleButtonClear(ActionEvent event) {
+    public void handleButtonClear(ActionEvent event
+    ) {
 
         clear();
 
@@ -264,8 +260,8 @@ public class FXMLDocumentController implements Initializable {
 
     public float operate(String o, float a, float b) {
 
-        a = numberInputF;
-        b = dataF;
+        a = data1f;
+        b = data2f;
         o = operator;
         float solution = 0f;
 
