@@ -145,7 +145,7 @@ public class FXMLDocumentController implements Initializable {
         }
         operator = o;
         numberInputS = "";
-        }        
+             
 
     }
 
